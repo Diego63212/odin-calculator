@@ -2,6 +2,7 @@ const display = document.querySelector('.display')
 const calculator = document.querySelector('#calculator-buttons');
 const clearBtn = document.querySelector('#clear')
 const operateBtn = document.querySelector('#operate')
+const backspaceBtn = document.querySelector('#backspace')
 
 let num1 = '';
 let operator = '';
@@ -17,10 +18,14 @@ function subtract(num1, num2) {
     return num1 - num2;
 }
 function multiply(num1, num2) {
-    return num1 * num2;
+    return Math.round(num1 * num2 * 100) / 100;
 }
 function divide(num1, num2) {
-    return num1 / num2;
+    if (num2 == 0) {
+        alert('What are you doing???')
+    } else {
+        return Math.round(num1 / num2 * 100) / 100;
+    }
 }
 
 function operate(operator, num1, num2) {
@@ -30,18 +35,16 @@ function operate(operator, num1, num2) {
     if (operator == '/') return (divide(num1, num2))
 }
 
-
 calculator.addEventListener('click', (event) => {
-    event.stopPropagation();
     if (event.target.classList.contains('number') && isFirstNumber) {
         num1 += event.target.textContent;
         console.log('First:', num1)
     }
     
     if (event.target.classList.contains('operator')) {
+        if (!num1) num1 = '0'
         if (num1 && num2 && operator) {
-            validate()
-            operator = event.target.textContent;
+            validateChain()
         } else if (num1 && !num2) {
             operator = event.target.textContent;
             console.log('Operator:', operator)
@@ -62,20 +65,33 @@ operateBtn.addEventListener('click', (event) => {
 });
 
 function validate() {
-
-    if (operator && num1 && num2) {
+    if (operator && num1) {
+        if (!num2) num2 = '0'
         result = operate(operator, num1, num2);;
         display.textContent = `Result: ${result}`;
         num1 = result.toString()
         num2 = '' 
         operator = ''
         console.log('Result:', result)
+        isFirstNumber = true
     }
+}
+
+function validateChain() {
+    result = operate(operator, num1, num2);;
+    display.textContent = `Result: ${result}`;
+    num1 = result.toString()
+    num2 = '' 
 }
 
 clearBtn.addEventListener('click', (event) => {
     event.stopPropagation()
     reset()
+})
+
+backspaceBtn.addEventListener('click', (event) => {
+    event.stopPropagation()
+    backspace()
 })
 
 function reset() {
@@ -90,4 +106,14 @@ function reset() {
 function update() {
     displayContent = `${num1} ${operator} ${num2}`
     display.textContent = displayContent
+    if (!num1) display.textContent = '0'
+}
+
+function backspace() {
+    if (isFirstNumber) {
+        num1 = num1.slice(0, num1.length - 1)
+    } else {
+        num2 = num2.slice(0, num2.length - 1)
+    }
+    update()
 }
