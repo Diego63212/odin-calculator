@@ -4,6 +4,7 @@ const clearBtn = document.querySelector('.clear')
 const operateBtn = document.querySelector('.operate')
 const backspaceBtn = document.querySelector('.backspace')
 const periodBtn = document.querySelector('.dot')
+const buttonsDiv = document.querySelector('.buttons')
 
 let num1 = '';
 let operator = '';
@@ -39,8 +40,32 @@ function operate(operator, num1, num2) {
     if (operator == '*') return (multiply(num1, num2))
     if (operator == '/') return (divide(num1, num2) || 'ERROR')
 }
+// Press button on valid keyboard event key
+document.addEventListener('keyup', event => {
+    console.log(event.key)
+    if (event.key == 'Escape') clearBtn.click();
+    if (event.key == 'Backspace') backspaceBtn.click();
+    if (event.key == 'Enter') operateBtn.click();
+    if (event.key == '+') document.querySelector('#k-sum').click();
+    if (event.key == '-') document.querySelector('#k-subtract').click();
+    if (event.key == '*') document.querySelector('#k-multiply').click();
+    if (event.key == '/') document.querySelector('#k-divide').click();
+    if (event.key == '0') document.querySelector('#k-0').click();
+    if (event.key == '1') document.querySelector('#k-1').click();
+    if (event.key == '2') document.querySelector('#k-2').click();
+    if (event.key == '3') document.querySelector('#k-3').click();
+    if (event.key == '4') document.querySelector('#k-4').click();
+    if (event.key == '5') document.querySelector('#k-5').click();
+    if (event.key == '6') document.querySelector('#k-6').click();
+    if (event.key == '7') document.querySelector('#k-7').click();
+    if (event.key == '8') document.querySelector('#k-8').click();
+    if (event.key == '9') document.querySelector('#k-9').click();
+    if (event.key == '.') document.querySelector('#k-dot').click();
+
+})
 
 calculator.addEventListener('click', (event) => {
+    event.stopPropagation()
     if (event.target.classList.contains('number') && isFirstNumber) {
         num1 += event.target.textContent;
         console.log('First:', num1)
