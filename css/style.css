@@ -12,7 +12,6 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    padding: 32px;
     height: 100vh;
 }
 
@@ -24,6 +23,14 @@ button {
     border-radius: 4px;
 }
 
+button:active {
+    background: #e0e0e0;
+    color: black;
+    -webkit-box-shadow: inset 0px 0px 5px #c1c1c1;
+       -moz-box-shadow: inset 0px 0px 5px #c1c1c1;
+            box-shadow: inset 0px 0px 5px #c1c1c1;
+     outline: none;
+}
 .calculator {
     background-color: rgb(8, 8, 8);
     border: 3px solid rgb(92, 92, 92);
@@ -45,7 +52,7 @@ button {
     overflow: hidden;
 }
 
-.buttons {
+.button-container {
     display: flex;
     flex-direction: column;
     row-gap: 5px;
@@ -62,7 +69,7 @@ button {
 }
 
 .number,
-.dot {
+.decimal {
     background-color: rgb(43, 43, 43);
 }
 
