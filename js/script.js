@@ -1,38 +1,43 @@
 const display = document.querySelector('.display')
 const calculator = document.querySelector('#calculator-buttons');
-const clearBtn = document.querySelector('#clear')
-const operateBtn = document.querySelector('#operate')
-const backspaceBtn = document.querySelector('#backspace')
+const clearBtn = document.querySelector('.clear')
+const operateBtn = document.querySelector('.operate')
+const backspaceBtn = document.querySelector('.backspace')
+const periodBtn = document.querySelector('.dot')
 
 let num1 = '';
 let operator = '';
 let num2 = '';
-let displayContent = ''
 let isFirstNumber = true;
-let result = 0;
+let result = '';
+
+periodBtn.disabled = true;
 
 function add(num1, num2) {
-    return +num1 + +num2;
+    return round(+num1 + +num2);
 }
 function subtract(num1, num2) {
-    return num1 - num2;
+    return round(num1 - num2);
 }
 function multiply(num1, num2) {
-    return Math.round(num1 * num2 * 100) / 100;
+    return round(num1 * num2);
 }
 function divide(num1, num2) {
     if (num2 == 0) {
         alert('What are you doing???')
     } else {
-        return Math.round(num1 / num2 * 100) / 100;
+        return round(num1 / num2);
     }
+}
+function round(result) {
+    return (Math.round(result * 1000) / 1000).toString();
 }
 
 function operate(operator, num1, num2) {
     if (operator == '+') return (add(num1, num2))
     if (operator == '-') return (subtract(num1, num2))
     if (operator == '*') return (multiply(num1, num2))
-    if (operator == '/') return (divide(num1, num2))
+    if (operator == '/') return (divide(num1, num2) || 'ERROR')
 }
 
 calculator.addEventListener('click', (event) => {
@@ -68,8 +73,8 @@ function validate() {
     if (operator && num1) {
         if (!num2) num2 = '0'
         result = operate(operator, num1, num2);;
-        display.textContent = `Result: ${result}`;
-        num1 = result.toString()
+        display.textContent = result;
+        num1 = result
         num2 = '' 
         operator = ''
         console.log('Result:', result)
@@ -79,9 +84,10 @@ function validate() {
 
 function validateChain() {
     result = operate(operator, num1, num2);;
-    display.textContent = `Result: ${result}`;
-    num1 = result.toString()
-    num2 = '' 
+    display.textContent = result;
+    num1 = result
+    num2 = ''
+    result = ''
 }
 
 clearBtn.addEventListener('click', (event) => {
@@ -104,9 +110,21 @@ function reset() {
 }
 
 function update() {
-    displayContent = `${num1} ${operator} ${num2}`
-    display.textContent = displayContent
+    display.textContent = `${num1} ${operator} ${num2}`
     if (!num1) display.textContent = '0'
+
+    if (isFirstNumber && num1.includes('.')) {
+        periodBtn.disabled = true;
+    } else {
+        periodBtn.disabled = false;
+    }
+
+    if (!isFirstNumber && num2 && num2.includes('.')) {
+        periodBtn.disabled = true;
+    } else if (!isFirstNumber) {
+        periodBtn.disabled = false;
+    }
+    checkDot()
 }
 
 function backspace() {
@@ -116,4 +134,18 @@ function backspace() {
         num2 = num2.slice(0, num2.length - 1)
     }
     update()
+}
+
+function checkDot () {
+    if (isFirstNumber && !num1 || num1.includes('.')) {
+        periodBtn.disabled = true;
+    } else {
+        periodBtn.disabled = false;
+    }
+
+    if (!isFirstNumber && !num2 || num2.includes('.')) {
+        periodBtn.disabled = true;
+    } else if (!isFirstNumber) {
+        periodBtn.disabled = false;
+    }
 }
