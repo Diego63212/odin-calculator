@@ -9,9 +9,11 @@ const buttonsDiv = document.querySelector('.buttons')
 let num1 = '';
 let operator = '';
 let num2 = '';
+// Just two stages? three or four should be experimented
 let isFirstNumber = true;
 let result = '';
 
+// THIS IS NOT IDEAL
 periodBtn.disabled = true;
 
 function add(num1, num2) {
@@ -30,17 +32,19 @@ function divide(num1, num2) {
         return round(num1 / num2);
     }
 }
+// Rounds the resulting number to three decimal places
 function round(result) {
     return (Math.round(result * 1000) / 1000).toString();
 }
 
+// Checks the operator so the correct math is run
 function operate(operator, num1, num2) {
     if (operator == '+') return (add(num1, num2))
     if (operator == '-') return (subtract(num1, num2))
     if (operator == '*') return (multiply(num1, num2))
     if (operator == '/') return (divide(num1, num2) || 'ERROR')
 }
-// Press button on valid keyboard event key
+// Press button on valid keyboard event key, but there has to be a better way with btn animations
 document.addEventListener('keyup', event => {
     console.log(event.key)
     if (event.key == 'Escape') clearBtn.click();
@@ -62,7 +66,7 @@ document.addEventListener('keyup', event => {
     if (event.key == '9') document.querySelector('#k-9').click();
     if (event.key == '.') document.querySelector('#k-dot').click();
 })
-
+// Main loop, problematic and needs to be spliced
 calculator.addEventListener('click', (event) => {
     event.stopPropagation()
     if (event.target.classList.contains('number') && isFirstNumber) {
@@ -136,13 +140,13 @@ function reset() {
 function update() {
     display.textContent = `${num1} ${operator} ${num2}`
     if (!num1) display.textContent = '0'
-
+    // PROBLEMATIC, button should never be disabled
     if (isFirstNumber && num1.includes('.')) {
         periodBtn.disabled = true;
     } else {
         periodBtn.disabled = false;
     }
-
+    // PROBLEMATIC, button should never be disabled
     if (!isFirstNumber && num2 && num2.includes('.')) {
         periodBtn.disabled = true;
     } else if (!isFirstNumber) {
@@ -159,7 +163,7 @@ function backspace() {
     }
     update()
 }
-
+// PROBLEMATIC, button should never be disabled
 function checkDot () {
     if (isFirstNumber && !num1 || num1.includes('.')) {
         periodBtn.disabled = true;
