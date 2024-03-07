@@ -61,7 +61,6 @@ document.addEventListener('keyup', event => {
     if (event.key == '8') document.querySelector('#k-8').click();
     if (event.key == '9') document.querySelector('#k-9').click();
     if (event.key == '.') document.querySelector('#k-dot').click();
-
 })
 
 calculator.addEventListener('click', (event) => {
