@@ -4,134 +4,116 @@ const clearBtn = document.querySelector('.clear')
 const ansBtn = document.querySelector('.operate')
 const backspaceBtn = document.querySelector('.backspace')
 const decimalBtn = document.querySelector('.decimal')
-const buttonsDiv = document.querySelector('.button-container')
 
-// New loop idea: stages //
-/*
-Create new variable named current, main text holder that will pass its value to other stages
-Create new variables numStage1, numStage2
-Create new variable and stage result, branch depending on action: press, clear || press, continue
-
-Pressing buttons should not do anything unless its allowed, buttons should be never disabled
-More individual listener to make code more readable
-*/
-let numStage1 = ''
-let numStage2 = ''
 let operator = ''
-let current = {
-    value: '',
-    saved: '',
-    test: function() {
-        this.saved = this.value;
-        this.value = '';
+let numbers = {
+    current: '',
+    previous: '',
+    store: function() {
+        this.previous = this.current;
+        this.current = '';
     }
 };
 let stage = 0;
 let previousOperator;
-let result = false;
+
 clearBtn.addEventListener('click', clearListener)
 decimalBtn.addEventListener('click', decimalListener)
-
-calculatorBtnDiv.addEventListener('click', (e) => {
-    e.stopPropagation()
-    if (e.target.nodeName == 'BUTTON') {
-        // STAGE 0 > STAGE 1
-        if (stage == 0) {
-            current.value = '';
-            console.log('STAGE 0>1')
-            stage++
-        }
-        if (e.target.classList.contains('number')) numberListener(e);
-    
-        // Fill with a 0 if nothing is input
-        if (stage == 1) {
-            if (!current.value) {
-                current.value = '0'
-            }
-        }
-        // Trigger after 0 fill
-        if (e.target.classList.contains('operator')) operatorListener(e);
-        /* if (e.target.classList.contains('decimal')) decimalListener(e); */
-    
-        if (stage == 2 && current.value) {
-            current.test()
-        }
-        if (stage == 3) {
-        }
-        // Chain, move result to current value
-        if (stage == 4) {
-            console.log('calculate')
-            current.value = operate(previousOperator, current.saved, current.value)
-            previousOperator = ''
-            current.test()
-            if (result) {
-                stage = 5;
-            } else {
-                stage = 2;
-            }
-        }
-        if (stage == 5) {
-            display.textContent = 'Result: ' + current.saved
-        }
-    
-        // DEBUG DISPLAY
-        display.textContent = `${current.saved} ${operator} ${current.value}`
-    
-        console.log(stage)
-    }
-})
-
 ansBtn.addEventListener('click', ansListener)
+backspaceBtn.addEventListener('click', backspaceListener)
 
-function numberListener(e) { 
-    //STAGE 2 > 3
+// Handle Stage 0
+function manageStart(skip) {
+    if (stage < 1 && skip) {
+        if (!numbers.current) {
+            numbers.current = '0'
+        }
+    }
+
+    if (stage == 0) {
+        stage++
+    }
+}
+
+function numberListener(e) {
+    manageStart()
+    // STAGE 2 > 3
     if (stage == 2) stage++
     // STAGE 1 & 2
     if (stage == 1 || stage == 3) {
-        current.value += e.target.textContent;
+        numbers.current += e.target.textContent;
     }
 }
 
 function operatorListener(e) {
-    // STAGE 1 > STAGE 2 || STAGE 3 > STAGE 4
-    if (current.value) {
-        console.log('chain')
-        previousOperator = operator
+    manageStart(true)
+    if (numbers.current) {
         stage++
+        if (!numbers.previous) {
+            //STAGE 1 > 2
+            numbers.store()
+        } else {
+            // STAGE 3 > 4
+            previousOperator = operator
+        }
     }
     operator = e.target.textContent
 }
 
 function decimalListener(e) {
-    console.log('decimal', e.type)
-    if (!current.value || current.value.includes('.')) {
-        console.log('decimal: do nothing')
-    } else {
-        current.value += e.target.textContent
-        console.log('decimal: add period')
+    manageStart(true)
+    if (!numbers.current.includes('.')) {
+        numbers.current += e.target.textContent
     }
 }
 
 function ansListener(e) {
-
-    if (operator && current.value && current.saved) {
-        stage = 4;
-    } else {
-        alert('Incomplete expression')
+    e.stopPropagation()
+    if (operator && (numbers.current || '0') && numbers.previous) {
+        let result = operate(operator, numbers.previous, numbers.current)
+        numbers.current = result
+        numbers.previous = ''
+        display.textContent = result
+        stage = 1
+        operator = ''
     }
 }
-
 function clearListener(e) {
-    e.stopPropagation()
+    /* e.stopPropagation() */
     stage = 0
     numStage1 = ''
     numStage2 = ''
     operator = ''
     previousOperator = ''
-    current.value = ''
-    current.test()
-    display.textContent = '0'
+    numbers.current = ''
+    numbers.store()
 }
+
+function backspaceListener(e) {
+    numbers.current = numbers.current.slice(0, numbers.current.length - 1)
+    if (!numbers.current && stage == 1) {
+        stage--
+    }
+}
+
+calculatorBtnDiv.addEventListener('click', (e) => {
+    if (e.target.nodeName == 'BUTTON') {
+        if (e.target.classList.contains('number')) numberListener(e);
+        if (e.target.classList.contains('operator')) operatorListener(e);
+
+        // Chain, move result to current value
+        if (stage == 4) {
+            numbers.current = operate(previousOperator, numbers.previous, numbers.current)
+            previousOperator = ''
+            numbers.store()
+            stage = 2;
+        }
+        // DISPLAY
+        display.textContent = `${numbers.previous} ${operator} ${numbers.current || '0'}`
+    
+        console.log(stage)
+    }
+})
 
 function add(num1, num2) {
     return round(+num1 + +num2);
@@ -162,11 +144,11 @@ function operate(operator, num1, num2) {
     if (operator == '/') return (divide(num1, num2) || 'ERROR')
 }
 // Press button on valid keyboard event key, but there has to be a better way with btn animations
-/* document.addEventListener('keyup', event => {
+document.addEventListener('keydown', event => {
     console.log(event.key)
     if (event.key == 'Escape') clearBtn.click();
     if (event.key == 'Backspace') backspaceBtn.click();
-    if (event.key == 'Enter') operateBtn.click();
+    if (event.key == 'Enter') ansBtn.click();
     if (event.key == '+') document.querySelector('#k-sum').click();
     if (event.key == '-') document.querySelector('#k-subtract').click();
     if (event.key == '*') document.querySelector('#k-multiply').click();
@@ -182,12 +164,4 @@ function operate(operator, num1, num2) {
     if (event.key == '9') document.querySelector('#k-9').click();
     if (event.key == '0') document.querySelector('#k-0').click();
     if (event.key == '.') document.querySelector('#k-dot').click();
-}) */
-
-/* function backspace() {
-    if (isFirstNumber) {
-        num1 = num1.slice(0, num1.length - 1)
-    } else {
-        num2 = num2.slice(0, num2.length - 1)
-    }
-} */
+})
