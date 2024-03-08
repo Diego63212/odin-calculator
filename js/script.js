@@ -5,7 +5,9 @@ const ansBtn = document.querySelector('.operate')
 const backspaceBtn = document.querySelector('.backspace')
 const decimalBtn = document.querySelector('.decimal')
 
+let stage = 0;
 let operator = ''
+let previousOperator;
 let numbers = {
     current: '',
     previous: '',
@@ -14,19 +16,20 @@ let numbers = {
         this.current = '';
     }
 };
-let stage = 0;
-let previousOperator;
 
 clearBtn.addEventListener('click', clearListener)
 decimalBtn.addEventListener('click', decimalListener)
 ansBtn.addEventListener('click', ansListener)
 backspaceBtn.addEventListener('click', backspaceListener)
 
+console.log('Stage:', stage)
+
 // Handle Stage 0
 function manageStart(skip) {
-    if (stage < 1 && skip) {
+    if (stage < 4 && skip) {
         if (!numbers.current) {
             numbers.current = '0'
+            if (stage == 2) stage++
         }
     }
 
@@ -67,19 +70,17 @@ function decimalListener(e) {
     }
 }
 
-function ansListener(e) {
-    e.stopPropagation()
+function ansListener() {
     if (operator && (numbers.current || '0') && numbers.previous) {
         let result = operate(operator, numbers.previous, numbers.current)
         numbers.current = result
         numbers.previous = ''
+        operator = ''
         display.textContent = result
         stage = 1
-        operator = ''
     }
 }
-function clearListener(e) {
-    /* e.stopPropagation() */
+function clearListener() {
     stage = 0
     numStage1 = ''
     numStage2 = ''
@@ -89,7 +90,7 @@ function clearListener(e) {
     numbers.store()
 }
 
-function backspaceListener(e) {
+function backspaceListener() {
     numbers.current = numbers.current.slice(0, numbers.current.length - 1)
     if (!numbers.current && stage == 1) {
         stage--
@@ -98,20 +99,20 @@ function backspaceListener(e) {
 
 calculatorBtnDiv.addEventListener('click', (e) => {
     if (e.target.nodeName == 'BUTTON') {
+
         if (e.target.classList.contains('number')) numberListener(e);
         if (e.target.classList.contains('operator')) operatorListener(e);
 
         // Chain, move result to current value
         if (stage == 4) {
             numbers.current = operate(previousOperator, numbers.previous, numbers.current)
-            previousOperator = ''
             numbers.store()
             stage = 2;
         }
         // DISPLAY
         display.textContent = `${numbers.previous} ${operator} ${numbers.current || '0'}`
     
-        console.log(stage)
+        console.log('Stage:', stage)
     }
 })
 
