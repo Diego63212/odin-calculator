@@ -1,34 +1,31 @@
-const display = document.querySelector('.display')
+const display = document.querySelector('.display');
 const calculatorBtnDiv = document.querySelector('#calculator-buttons');
-const clearBtn = document.querySelector('.clear')
-const ansBtn = document.querySelector('.operate')
-const backspaceBtn = document.querySelector('.backspace')
-const decimalBtn = document.querySelector('.decimal')
+const clearBtn = document.querySelector('.clear');
+const ansBtn = document.querySelector('.operate');
+const backspaceBtn = document.querySelector('.backspace');
+const decimalBtn = document.querySelector('.decimal');
 
 let stage = 1;
-let operator = ''
-let previousOperator;
+let operator = '';
 let number = {
     current: '',
     previous: '',
-    store: function() {
+    store: function () {
         this.previous = this.current;
         this.current = '';
     }
 };
 
-clearBtn.addEventListener('click', clearListener)
-decimalBtn.addEventListener('click', decimalListener)
-ansBtn.addEventListener('click', ansListener)
-backspaceBtn.addEventListener('click', backspaceListener)
+clearBtn.addEventListener('click', clearListener);
+decimalBtn.addEventListener('click', decimalListener);
+ansBtn.addEventListener('click', ansListener);
+backspaceBtn.addEventListener('click', backspaceListener);
 
-console.log('Stage:', stage)
-
-/* function zeroFill() {
+function zeroFill() {
     if (!number.current) {
-        number.current = '0'
-    }
-} */
+        number.current = '0';
+    };
+}
 
 function numberListener(e) {
     number.current += e.target.textContent;
@@ -36,63 +33,59 @@ function numberListener(e) {
 
 function operatorListener(e) {
     if (number.current) {
-        stage++
+        stage++;
         if (!number.previous) {
-            // STAGE 1 > 2
-            number.store()
-        } else {
-            // STAGE 3 > 4
-            previousOperator = operator
+            number.store();
+        }
+    } else {
+        if (stage == 1) {
+            zeroFill();
+            number.store();
         }
     }
-    operator = e.target.textContent
+    if (stage == 3) {
+        number.current = getResult();
+        number.store();
+        stage--;
+    }
+    operator = e.target.textContent;
 }
 
 function decimalListener(e) {
-    zeroFill()
     if (!number.current.includes('.')) {
-        number.current += e.target.textContent
+        zeroFill();
+        number.current += e.target.textContent;
     }
 }
 
 function ansListener() {
-    if (operator && (number.current || '0') && number.previous) {
-        let result = operate(operator, number.previous, number.current)
-        number.current = result
-        number.previous = ''
-        operator = ''
-        display.textContent = result
-        stage = 1
+    if (number.previous) {
+        let result = getResult();
+        number.current = result;
+        number.previous = '';
+        operator = '';
+        stage = 1;
     }
 }
 function clearListener() {
-    stage = 1
-    operator = ''
-    previousOperator = ''
-    number.current = ''
-    number.store()
+    stage = 1;
+    operator = '';
+    previousOperator = '';
+    number.current = '';
+    number.store();
 }
 
 function backspaceListener() {
-    number.current = number.current.slice(0, number.current.length - 1)
+    number.current = number.current.slice(0, number.current.length - 1);
 }
 
 calculatorBtnDiv.addEventListener('click', (e) => {
     if (e.target.nodeName == 'BUTTON') {
-
         if (e.target.classList.contains('number')) numberListener(e);
         if (e.target.classList.contains('operator')) operatorListener(e);
-
-        // Chain, move result to current value
-        if (stage == 3) {
-            number.current = operate(previousOperator, number.previous, number.current)
-            number.store()
-            stage = 2;
-        }
         // DISPLAY
-        display.textContent = `${number.previous} ${operator} ${number.current || '0'}`
-    
-        console.log('Stage:', stage)
+        display.textContent = `${number.previous} ${operator} ${number.current || '0'}`;
+        console.log('Stage:', stage);
     }
 })
 
@@ -107,7 +100,7 @@ function multiply(num1, num2) {
 }
 function divide(num1, num2) {
     if (num2 == 0) {
-        alert('What are you doing???')
+        alert('What are you doing???');
     } else {
         return round(num1 / num2);
     }
@@ -117,12 +110,16 @@ function round(result) {
     return (Math.round(result * 1000) / 1000).toString();
 }
 
+function getResult() {
+    return operate(operator, number.previous, number.current);
+}
+
 // Checks the operator so the correct math is run
 function operate(operator, num1, num2) {
-    if (operator == '+') return (add(num1, num2))
-    if (operator == '-') return (subtract(num1, num2))
-    if (operator == '*') return (multiply(num1, num2))
-    if (operator == '/') return (divide(num1, num2) || 'ERROR')
+    if (operator == '+') return (add(num1, num2));
+    if (operator == '-') return (subtract(num1, num2));
+    if (operator == '*') return (multiply(num1, num2));
+    if (operator == '/') return (divide(num1, num2) || 'ERROR');
 }
 // Press button on valid keyboard event key, but there has to be a better way with btn animations
 document.addEventListener('keydown', event => {
@@ -145,4 +142,4 @@ document.addEventListener('keydown', event => {
     if (event.key == '9') document.querySelector('#k-9').click();
     if (event.key == '0') document.querySelector('#k-0').click();
     if (event.key == '.') document.querySelector('#k-dot').click();
-})
+});
