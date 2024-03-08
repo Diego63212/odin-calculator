@@ -53,7 +53,7 @@ function operatorListener(e) {
     if (numbers.current) {
         stage++
         if (!numbers.previous) {
-            //STAGE 1 > 2
+            // STAGE 1 > 2
             numbers.store()
         } else {
             // STAGE 3 > 4
@@ -82,8 +82,6 @@ function ansListener() {
 }
 function clearListener() {
     stage = 0
-    numStage1 = ''
-    numStage2 = ''
     operator = ''
     previousOperator = ''
     numbers.current = ''
