@@ -5,7 +5,7 @@ const ansBtn = document.querySelector('.operate')
 const backspaceBtn = document.querySelector('.backspace')
 const decimalBtn = document.querySelector('.decimal')
 
-let stage = 0;
+let stage = 1;
 let operator = ''
 let previousOperator;
 let numbers = {
@@ -24,32 +24,16 @@ backspaceBtn.addEventListener('click', backspaceListener)
 
 console.log('Stage:', stage)
 
-// Handle Stage 0
-function manageStart(skip) {
-    if (stage < 4 && skip) {
-        if (!numbers.current) {
-            numbers.current = '0'
-            if (stage == 2) stage++
-        }
-    }
-
-    if (stage == 0) {
-        stage++
-    }
-}
-
 function numberListener(e) {
-    manageStart()
     // STAGE 2 > 3
     if (stage == 2) stage++
-    // STAGE 1 & 2
+    // STAGE 1 & 3 WRITING
     if (stage == 1 || stage == 3) {
         numbers.current += e.target.textContent;
     }
 }
 
 function operatorListener(e) {
-    manageStart(true)
     if (numbers.current) {
         stage++
         if (!numbers.previous) {
@@ -64,7 +48,6 @@ function operatorListener(e) {
 }
 
 function decimalListener(e) {
-    manageStart(true)
     if (!numbers.current.includes('.')) {
         numbers.current += e.target.textContent
     }
@@ -81,7 +64,7 @@ function ansListener() {
     }
 }
 function clearListener() {
-    stage = 0
+    stage = 1
     operator = ''
     previousOperator = ''
     numbers.current = ''
