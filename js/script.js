@@ -5,7 +5,6 @@ const ansBtn = document.querySelector('.operate');
 const backspaceBtn = document.querySelector('.backspace');
 const decimalBtn = document.querySelector('.decimal');
 
-let stage = 1;
 let operator = '';
 let number = {
     current: '',
@@ -13,13 +12,20 @@ let number = {
     store: function () {
         this.previous = this.current;
         this.current = '';
-    }
+    },
 };
 
 clearBtn.addEventListener('click', clearListener);
-decimalBtn.addEventListener('click', decimalListener);
 ansBtn.addEventListener('click', ansListener);
-backspaceBtn.addEventListener('click', backspaceListener);
+decimalBtn.addEventListener('click', (e) => {
+    if (!number.current.includes('.')) {
+        zeroFill();
+        number.current += e.target.textContent;
+    }
+});
+backspaceBtn.addEventListener('click', () => {
+    number.current = number.current.slice(0, number.current.length - 1);
+});
 
 function zeroFill() {
     if (!number.current) {
@@ -27,67 +33,43 @@ function zeroFill() {
     };
 }
 
-function numberListener(e) {
-    number.current += e.target.textContent;
-}
-
 function operatorListener(e) {
-    if (number.current) {
-        stage++;
-        if (!number.previous) {
-            number.store();
-        }
-    } else {
-        if (stage == 1) {
-            zeroFill();
-            number.store();
-        }
-    }
-    if (stage == 3) {
-        number.current = getResult();
+    if (number.current && !number.previous) {
         number.store();
-        stage--;
+    } else if (!number.current && !number.previous) {
+        zeroFill();
+        number.store();
+    } else if (number.current && number.previous) {
+        calculateResult()
+        number.store();
     }
     operator = e.target.textContent;
 }
 
-function decimalListener(e) {
-    if (!number.current.includes('.')) {
-        zeroFill();
-        number.current += e.target.textContent;
-    }
+function calculateResult() {
+    number.current = operate(operator, number.previous, number.current);
 }
 
 function ansListener() {
     if (number.previous) {
-        let result = getResult();
-        number.current = result;
+        calculateResult()
         number.previous = '';
         operator = '';
-        stage = 1;
     }
 }
-function clearListener() {
-    stage = 1;
-    operator = '';
-    previousOperator = '';
-    number.current = '';
-    number.store();
-}
 
-function backspaceListener() {
-    number.current = number.current.slice(0, number.current.length - 1);
+function clearListener() {
+    operator = '';
+    number.current = '';
+    number.previous = '';
 }
 
 calculatorBtnDiv.addEventListener('click', (e) => {
-    if (e.target.nodeName == 'BUTTON') {
-        if (e.target.classList.contains('number')) numberListener(e);
-        if (e.target.classList.contains('operator')) operatorListener(e);
-        // DISPLAY
-        display.textContent = `${number.previous} ${operator} ${number.current || '0'}`;
-        console.log('Stage:', stage);
-    }
-})
+    if (e.target.classList.contains('number')) {number.current += e.target.textContent};
+    if (e.target.classList.contains('operator')) operatorListener(e);
+    // DISPLAY
+    display.textContent = `${number.previous} ${operator} ${number.current || '0'}`;
+});
 
 function add(num1, num2) {
     return round(+num1 + +num2);
@@ -110,10 +92,6 @@ function round(result) {
     return (Math.round(result * 1000) / 1000).toString();
 }
 
-function getResult() {
-    return operate(operator, number.previous, number.current);
-}
-
 // Checks the operator so the correct math is run
 function operate(operator, num1, num2) {
     if (operator == '+') return (add(num1, num2));
@@ -123,7 +101,6 @@ function operate(operator, num1, num2) {
 }
 // Press button on valid keyboard event key, but there has to be a better way with btn animations
 document.addEventListener('keydown', event => {
-    console.log(event.key)
     if (event.key == 'Escape') clearBtn.click();
     if (event.key == 'Backspace') backspaceBtn.click();
     if (event.key == 'Enter') ansBtn.click();
