@@ -91,23 +91,21 @@ function operate(operator, num1, num2) {
     if (operator == '*') return (multiply(num1, num2));
     if (operator == '/') return (divide(num1, num2) || 'ERROR');
 }
-document.addEventListener('keydown', event => {
-    if (event.key == 'Escape') clearBtn.click();
-    if (event.key == 'Backspace') backspaceBtn.click();
-    if (event.key == 'Enter') ansBtn.click();
-    if (event.key == '+') document.querySelector('#k-sum').click();
-    if (event.key == '-') document.querySelector('#k-subtract').click();
-    if (event.key == '*') document.querySelector('#k-multiply').click();
-    if (event.key == '/') document.querySelector('#k-divide').click();
-    if (event.key == '1') document.querySelector('#k-1').click();
-    if (event.key == '2') document.querySelector('#k-2').click();
-    if (event.key == '3') document.querySelector('#k-3').click();
-    if (event.key == '4') document.querySelector('#k-4').click();
-    if (event.key == '5') document.querySelector('#k-5').click();
-    if (event.key == '6') document.querySelector('#k-6').click();
-    if (event.key == '7') document.querySelector('#k-7').click();
-    if (event.key == '8') document.querySelector('#k-8').click();
-    if (event.key == '9') document.querySelector('#k-9').click();
-    if (event.key == '0') document.querySelector('#k-0').click();
-    if (event.key == '.') document.querySelector('#k-dot').click();
+// Uses getElementById because it doesn't return an error on invalid id like querySelector
+document.addEventListener('keydown', e => {
+    let element = document.getElementById(`kb:${e.key}`)
+    if (element) {
+        element.className = element.className.replace(':active', '')
+        element.click()
+        if (!element.classList.contains('number:active')) {
+            element.className += ':active'
+        }
+    }
 });
+
+document.addEventListener('keyup', e => {
+    let element = document.getElementById(`kb:${e.key}`)
+    if (element) {
+        element.className = element.className.replace(':active', '')
+    }
+})
