@@ -15,16 +15,14 @@ let number = {
     },
 };
 
-clearBtn.addEventListener('click', clearListener);
-ansBtn.addEventListener('click', ansListener);
+clearBtn.addEventListener('click', clearAll);
+ansBtn.addEventListener('click', getAns);
+backspaceBtn.addEventListener('click', () => number.current = number.current.slice(0, number.current.length - 1));
 decimalBtn.addEventListener('click', (e) => {
     if (!number.current.includes('.')) {
         zeroFill();
         number.current += e.target.textContent;
     }
-});
-backspaceBtn.addEventListener('click', () => {
-    number.current = number.current.slice(0, number.current.length - 1);
 });
 
 function zeroFill() {
@@ -32,42 +30,37 @@ function zeroFill() {
         number.current = '0';
     };
 }
-
-function operatorListener(e) {
+// Makes sure expected action is taken when a user clicks and chains calculations
+function operatorCheck(e) {
     if (number.current && !number.previous) {
         number.store();
     } else if (!number.current && !number.previous) {
         zeroFill();
         number.store();
     } else if (number.current && number.previous) {
-        calculateResult()
+        number.current = operate(operator, number.previous, number.current);
         number.store();
     }
     operator = e.target.textContent;
 }
 
-function calculateResult() {
-    number.current = operate(operator, number.previous, number.current);
-}
-
-function ansListener() {
+function getAns() {
     if (number.previous) {
-        calculateResult()
+        number.current = operate(operator, number.previous, number.current);
         number.previous = '';
         operator = '';
     }
 }
 
-function clearListener() {
+function clearAll() {
     operator = '';
     number.current = '';
     number.previous = '';
 }
-
+// Listen to bubbling click events from buttons with class number/operator inside this div. Also update display
 calculatorBtnDiv.addEventListener('click', (e) => {
     if (e.target.classList.contains('number')) {number.current += e.target.textContent};
-    if (e.target.classList.contains('operator')) operatorListener(e);
-    // DISPLAY
+    if (e.target.classList.contains('operator')) operatorCheck(e);
     display.textContent = `${number.previous} ${operator} ${number.current || '0'}`;
 });
 
@@ -92,14 +85,12 @@ function round(result) {
     return (Math.round(result * 1000) / 1000).toString();
 }
 
-// Checks the operator so the correct math is run
 function operate(operator, num1, num2) {
     if (operator == '+') return (add(num1, num2));
     if (operator == '-') return (subtract(num1, num2));
     if (operator == '*') return (multiply(num1, num2));
     if (operator == '/') return (divide(num1, num2) || 'ERROR');
 }
-// Press button on valid keyboard event key, but there has to be a better way with btn animations
 document.addEventListener('keydown', event => {
     if (event.key == 'Escape') clearBtn.click();
     if (event.key == 'Backspace') backspaceBtn.click();
