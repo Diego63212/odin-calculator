@@ -25,6 +25,7 @@ button {
     min-width: 60px;
     border: 2px outset rgb(118, 118, 118);
     border-radius: 4px;
+    cursor: pointer;
 }
 
 button:active {
