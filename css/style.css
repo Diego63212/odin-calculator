@@ -23,7 +23,7 @@ button {
     padding: 18px 24px;
     min-height: 55px;
     min-width: 60px;
-    border: 2px outset rgb(118, 118, 118);
+    border: 2px outset rgb(133, 133, 133);
     border-radius: 4px;
     cursor: pointer;
 }
@@ -77,9 +77,13 @@ button:active {
     background-color: rgb(43, 43, 43);
 }
 
+.operator,
+.operate {
+    border-color: rgb(172, 172, 172);
+}
+
 .operator {
     background-color: rgb(112, 112, 112);
-    border-color: rgb(156, 156, 156);
 }
 
 .operate {
