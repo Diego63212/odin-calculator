@@ -95,10 +95,9 @@ function operate(operator, num1, num2) {
 document.addEventListener('keydown', e => {
     let element = document.getElementById(`kb:${e.key}`)
     if (element) {
-        element.className = element.className.replace(':active', '')
         element.click()
-        if (!element.classList.contains('number:active')) {
-            element.className += ':active'
+        if (!element.classList.contains('active')) {
+            element.className += ' active'
         }
     }
 });
@@ -106,6 +105,6 @@ document.addEventListener('keydown', e => {
 document.addEventListener('keyup', e => {
     let element = document.getElementById(`kb:${e.key}`)
     if (element) {
-        element.className = element.className.replace(':active', '')
+        element.className = element.className.replace(' active', '')
     }
 })
