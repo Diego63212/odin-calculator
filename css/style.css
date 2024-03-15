@@ -1,6 +1,6 @@
 html {
     font-size: 62.5%;
-    font-family: system-ui, "Roboto", sans-serif;
+    font-family: "Roboto", sans-serif, system-ui;
 }
 
 * {
