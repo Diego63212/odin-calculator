@@ -15,13 +15,25 @@ let number = {
     },
 };
 
-clearBtn.addEventListener('click', clearAll);
-ansBtn.addEventListener('click', getAns);
+clearBtn.addEventListener('click', () => {
+    operator = '';
+    number.current = '';
+    number.previous = '';
+});
+
+ansBtn.addEventListener('click', () => {
+    if (number.previous) {
+        number.current = operate(operator, number.previous, number.current);
+        number.previous = '';
+        operator = '';
+    }
+});
+
 backspaceBtn.addEventListener('click', () => number.current = number.current.slice(0, number.current.length - 1));
-decimalBtn.addEventListener('click', (e) => {
+decimalBtn.addEventListener('click', () => {
     if (!number.current.includes('.')) {
         zeroFill();
-        number.current += e.target.textContent;
+        number.current += '.';
     }
 });
 
@@ -43,25 +55,12 @@ function operatorCheck(e) {
     }
     operator = e.target.textContent;
 }
-
-function getAns() {
-    if (number.previous) {
-        number.current = operate(operator, number.previous, number.current);
-        number.previous = '';
-        operator = '';
-    }
-}
-
-function clearAll() {
-    operator = '';
-    number.current = '';
-    number.previous = '';
-}
 // Listen to bubbling click events from buttons with class number/operator inside this div. Also update display
 calculatorBtnDiv.addEventListener('click', (e) => {
     if (e.target.classList.contains('number')) {number.current += e.target.textContent};
     if (e.target.classList.contains('operator')) operatorCheck(e);
     display.textContent = `${number.previous} ${operator} ${number.current || '0'}`;
+    if (number.current == 'ERROR') number.current = ''
 });
 
 function add(num1, num2) {
@@ -82,7 +81,7 @@ function divide(num1, num2) {
 }
 // Rounds the resulting number to three decimal places
 function round(result) {
-    return (Math.round(result * 1000) / 1000).toString();
+    return (Math.round(result * 1000) / 1000);
 }
 
 function operate(operator, num1, num2) {
