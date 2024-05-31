@@ -32,7 +32,7 @@ calculatorBtnDiv.addEventListener('click', (e) => {
     if (e.target.classList.contains('clear')) modularClear();
     if (e.target.classList.contains('backspace')) currentOperand = currentOperand.slice(0, currentOperand.length - 1);
     display.textContent = `${previousOperand} ${operator} ${currentOperand || '0'}`;
-    if (currentOperand === 'ERROR') currentOperand = '';
+    if (currentOperand === 'ERROR' || previousOperand === 'ERROR') modularClear();
 });
 // Makes sure expected action is taken when a user clicks and chains calculations
 function operatorCheck(e) {
@@ -54,23 +54,18 @@ function operate() {
     if (previousOperand && operator === '-') result = subtract();
     if (previousOperand && operator === '*') result = multiply();
     if (previousOperand && operator === '/') result = divide();
-    modularClear()
-    currentOperand = round(result);
+    modularClear();
+    if (Number.isFinite(result)) return currentOperand = round(result);
+    currentOperand = 'ERROR';
 };
 // Math
 function add() {return +previousOperand + +currentOperand};
 function subtract() {return previousOperand - currentOperand};
 function multiply() {return previousOperand * currentOperand};
-function divide() {
-    if (currentOperand == false) {
-        alert('What are you doing???');
-    } else {
-        return round(previousOperand / currentOperand);
-    };
-};
+function divide() {return previousOperand / currentOperand};
 // Rounds the number to three decimal places
 function round(result) {
-    return (Math.round(result * 1000) / 1000) || 'ERROR';
+    return (Math.round(result * 1000) / 1000);
 }
 // Uses getElementById because it doesn't return an error on invalid id like querySelector
 document.addEventListener('keydown', e => {
