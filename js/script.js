@@ -3,7 +3,7 @@ const calculatorBtnDiv = document.querySelector('#calculator-buttons');
 let operator = '';
 let currentOperand = '0';
 let previousOperand = '';
-
+let hasClass = (e, className) => e.target.classList.contains(className); // Check element class short version
 // Math operations
 let add = () => +previousOperand + +currentOperand;
 let subtract = () => previousOperand - currentOperand;
@@ -18,7 +18,7 @@ function operate() {
     if (operator === '*') result = multiply();
     if (operator === '/' && currentOperand > '0') result = divide(); // Don't compute division by zero
     modularClear();
-    currentOperand = (result) ? round(result) : 'ERROR'; // Return error on empty result (division by zero)
+    currentOperand = (Number.isFinite(result)) ? round(result).toString() : 'ERROR'; // Error on Infinity (division by zero)
 };
 // Saves number or result for future use
 function storeOperand() {
@@ -44,18 +44,18 @@ function operatorCheck(e) {
 // Listen to bubbling click events from buttons with classes inside this div. Update display after interaction
 calculatorBtnDiv.addEventListener('click', (e) => {
     if (currentOperand === 'ERROR' || previousOperand === 'ERROR') modularClear();
-    if (e.target.classList.contains('number')) {
+    if (hasClass(e, 'number')) {
         if (currentOperand === '0') currentOperand = '';
         currentOperand += e.target.textContent;
     };
-    if (e.target.classList.contains('decimal')) {
+    if (hasClass(e, 'decimal')) {
         if (!currentOperand.includes('.')) currentOperand += '.';
     };
-    if (e.target.classList.contains('operator')) operatorCheck(e);
-    if (e.target.classList.contains('operate') && previousOperand) operate();
-    if (e.target.classList.contains('clear')) modularClear();
-    if (e.target.classList.contains('backspace')) currentOperand = currentOperand.slice(0, currentOperand.length - 1);
-    if (currentOperand === '') currentOperand = '0'; // Safeguard against invalid operations
+    if (hasClass(e, 'operator')) operatorCheck(e);
+    if (hasClass(e, 'operate') && previousOperand) operate();
+    if (hasClass(e, 'clear')) modularClear();
+    if (hasClass(e, 'backspace')) currentOperand = currentOperand.slice(0, currentOperand.length - 1);
+    if (currentOperand === '') currentOperand = '0'; // Safeguard against invalid states
     display.textContent = `${previousOperand} ${operator} ${currentOperand}`;
 });
 // Uses getElementById because it doesn't return an error on invalid id like querySelector
@@ -63,7 +63,7 @@ document.addEventListener('keydown', e => {
     const element = document.getElementById(`kb:${e.key}`);
     if (element) {
         element.click();
-        if (!element.classList.contains('active')) {
+        if (!hasClass(e, 'active')) {
             element.classList.toggle('active');
         };
     };
