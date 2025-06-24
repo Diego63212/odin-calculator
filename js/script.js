@@ -1,7 +1,8 @@
 const display = document.querySelector('.display');
 const calculatorBtnDiv = document.querySelector('#calculator-buttons');
 const hasClass = (e, className) => e.target.classList.contains(className); // Check element class short version
-let operator = previousOperand = currentOperand = '';
+let operator = previousOperand = '';
+let currentOperand = '0';
 // Math operations
 const add = () => +previousOperand + +currentOperand;  // Prevent string concatenation
 const subtract = () => previousOperand - currentOperand;
